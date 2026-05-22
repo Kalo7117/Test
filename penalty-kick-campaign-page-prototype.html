@@ -1,0 +1,1123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Penalty King 活动页原型</title>
+  <style>
+    :root {
+      --ink: #182235;
+      --muted: #667085;
+      --line: #d9e2ee;
+      --paper: #ffffff;
+      --soft: #f5f8fc;
+      --blue: #2168e8;
+      --green: #18764a;
+      --green-dark: #0e5535;
+      --gold: #ffd65c;
+      --orange: #ff7a35;
+      --red: #d92d20;
+      --shadow: 0 18px 44px rgba(24, 34, 53, .15);
+      --radius: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background: #eef4f9;
+    }
+    button, select { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .58; }
+
+    .page {
+      background:
+        linear-gradient(180deg, rgba(10, 28, 52, .14), rgba(238, 244, 249, 0) 360px),
+        #eef4f9;
+    }
+
+    .banner {
+      min-height: 210px;
+      display: grid;
+      place-items: center;
+      padding: 34px 20px 30px;
+      text-align: center;
+      color: #fff;
+      background:
+        linear-gradient(180deg, rgba(5, 18, 36, .46), rgba(5, 18, 36, .18)),
+        radial-gradient(circle at 24% 26%, rgba(255, 214, 92, .54), transparent 130px),
+        radial-gradient(circle at 78% 16%, rgba(96, 220, 255, .48), transparent 160px),
+        linear-gradient(135deg, #133963 0%, #158052 52%, #102b56 100%);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .banner::after {
+      content: "";
+      position: absolute;
+      left: -7%;
+      right: -7%;
+      bottom: -92px;
+      height: 180px;
+      border-radius: 50% 50% 0 0;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.12) 0 2px, transparent 2px 38px),
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0));
+      transform: perspective(180px) rotateX(54deg);
+    }
+
+    .banner-inner { position: relative; z-index: 1; max-width: 880px; }
+    .banner h1 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 58px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+    .banner p {
+      margin: 12px auto 0;
+      max-width: 640px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: rgba(255,255,255,.86);
+    }
+    .discount {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      margin-top: 14px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .96);
+      color: var(--red);
+      font-weight: 900;
+    }
+
+    .tabs {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 8px 20px rgba(24,34,53,.08);
+    }
+    .tabs a {
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 10px;
+      border-right: 1px solid var(--line);
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 750;
+      text-align: center;
+    }
+    .tabs a:last-child { border-right: 0; }
+
+    .section-head {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      text-align: center;
+      border-top: 1px solid rgba(24,34,53,.08);
+      border-bottom: 1px solid rgba(24,34,53,.08);
+      font-size: 21px;
+      font-weight: 850;
+    }
+    .section-head.gold { background: #ffe79c; }
+    .section-head.blue { background: #cde7fb; }
+    .section-head.green { background: #b9dda4; }
+    .section-head.yellow { background: #ffdc68; }
+    .section-head.gray { background: #d8d8d8; }
+    .trophy { color: #9b6400; }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 310px;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .game-card, .side-card, .product-card, .wide-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .game-card { overflow: hidden; }
+    .game-toolbar {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfdff;
+    }
+    .game-toolbar h2 { margin: 0; font-size: 22px; line-height: 1.2; }
+    .game-toolbar p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+    .quick-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .ghost-btn, .primary-btn, .dark-btn, .mini-btn {
+      min-height: 40px;
+      border-radius: 999px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font-weight: 800;
+    }
+    .primary-btn {
+      min-height: 54px;
+      min-width: 178px;
+      border: 0;
+      color: #321700;
+      background: linear-gradient(180deg, #ffe988, #ffb83f);
+      box-shadow: 0 12px 26px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.72);
+      font-size: 18px;
+    }
+    .dark-btn {
+      border: 0;
+      color: #fff;
+      background: #172033;
+    }
+    .mini-btn {
+      min-height: 34px;
+      padding: 0 10px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .stage {
+      position: relative;
+      min-height: 520px;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 18%, rgba(255,255,255,.2), transparent 180px),
+        linear-gradient(180deg, rgba(4,17,30,.52) 0 22%, rgba(4,17,30,0) 23%),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 36px, rgba(255,255,255,.025) 36px 72px),
+        linear-gradient(180deg, var(--green) 0%, var(--green-dark) 100%);
+    }
+    .stadium-lights {
+      position: absolute;
+      top: 22px;
+      left: 32px;
+      right: 32px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .light-bar {
+      width: 130px;
+      height: 18px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #fff, #9df2ff, #fff);
+      box-shadow: 0 0 32px rgba(157,242,255,.55);
+    }
+    .goal {
+      position: absolute;
+      left: 50%;
+      top: 92px;
+      width: min(560px, 76%);
+      height: 220px;
+      transform: translateX(-50%);
+      border: 10px solid #fff;
+      border-bottom: 0;
+      border-radius: 7px 7px 0 0;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.30) 0 2px, transparent 2px 30px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.24) 0 2px, transparent 2px 24px),
+        rgba(5, 18, 36, .16);
+      box-shadow: inset 0 12px 30px rgba(0,0,0,.12), 0 16px 30px rgba(0,0,0,.2);
+    }
+    .keeper {
+      position: absolute;
+      left: 50%;
+      top: 228px;
+      width: 96px;
+      height: 82px;
+      transform: translateX(-50%);
+      transition: transform .54s cubic-bezier(.2,.9,.2,1);
+      z-index: 3;
+    }
+    .keeper::before {
+      content: "";
+      position: absolute;
+      left: 35px;
+      top: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #ffd9b0;
+    }
+    .keeper::after {
+      content: "";
+      position: absolute;
+      left: 23px;
+      top: 28px;
+      width: 50px;
+      height: 48px;
+      border-radius: 16px 16px 8px 8px;
+      background: linear-gradient(180deg, #22c2e8, #1661d8);
+      box-shadow: -31px 8px 0 -10px #22c2e8, 31px 8px 0 -10px #22c2e8;
+    }
+    .keeper.left { transform: translateX(-185%) rotate(-13deg); }
+    .keeper.right { transform: translateX(84%) rotate(13deg); }
+    .penalty-box {
+      position: absolute;
+      left: 50%;
+      bottom: 74px;
+      width: min(720px, 88%);
+      height: 190px;
+      transform: translateX(-50%);
+      border: 3px solid rgba(255,255,255,.5);
+      border-bottom: 0;
+      border-radius: 999px 999px 0 0;
+    }
+    .ball {
+      position: absolute;
+      left: calc(50% - 23px);
+      bottom: 96px;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, #111 0 16%, transparent 17%),
+        radial-gradient(circle at 32% 28%, #111 0 8%, transparent 9%),
+        radial-gradient(circle at 70% 33%, #111 0 8%, transparent 9%),
+        radial-gradient(circle at 37% 72%, #111 0 8%, transparent 9%),
+        #fff;
+      box-shadow: 0 12px 18px rgba(0,0,0,.28);
+      transition: transform .84s cubic-bezier(.16,.86,.22,1), opacity .32s ease;
+      z-index: 4;
+    }
+    .ball.left { transform: translate(-160px, -275px) scale(.54) rotate(-340deg); }
+    .ball.center { transform: translate(0, -300px) scale(.52) rotate(360deg); }
+    .ball.right { transform: translate(160px, -275px) scale(.54) rotate(340deg); }
+    .ball.fade { opacity: .12; }
+    .exchange-box {
+      position: absolute;
+      right: 18px;
+      bottom: 96px;
+      z-index: 6;
+      width: 158px;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,.48);
+      border-radius: var(--radius);
+      color: #fff;
+      background: rgba(5, 18, 36, .58);
+      backdrop-filter: blur(10px);
+    }
+    .exchange-box b, .exchange-box span { display: block; }
+    .exchange-box b { font-size: 13px; }
+    .exchange-box span { margin: 5px 0 10px; color: rgba(255,255,255,.84); font-size: 12px; line-height: 1.45; }
+    .exchange-box button {
+      width: 100%;
+      min-height: 36px;
+      border: 0;
+      border-radius: 6px;
+      color: #0c2638;
+      background: #9df2ff;
+      font-weight: 850;
+    }
+    .kick-zone {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 22px;
+      z-index: 7;
+      display: grid;
+      place-items: center;
+      gap: 9px;
+    }
+    .stage-note {
+      min-height: 22px;
+      color: rgba(255,255,255,.92);
+      font-size: 13px;
+      text-align: center;
+      text-shadow: 0 1px 4px rgba(0,0,0,.42);
+    }
+    .status-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding: 14px;
+      border-top: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.08);
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      z-index: 2;
+    }
+    .status-pill {
+      min-height: 44px;
+      padding: 8px 10px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.93);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.1);
+    }
+    .status-pill span { color: var(--muted); font-size: 12px; }
+    .status-pill strong { font-size: 18px; color: #0c5f3e; }
+
+    .side-card {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .side-card h3 { margin: 0; font-size: 18px; }
+    .reward-list { display: grid; gap: 9px; }
+    .reward-item {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfdff;
+    }
+    .badge {
+      min-height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--blue), #20b6d9);
+      font-size: 12px;
+      font-weight: 850;
+      text-align: center;
+    }
+    .reward-item:first-child .badge { background: #7b8798; }
+    .reward-item:last-child .badge { color: #3a1d00; background: linear-gradient(135deg, var(--orange), var(--gold)); }
+    .reward-item strong, .reward-item span { display: block; }
+    .reward-item strong { font-size: 13px; }
+    .reward-item span { margin-top: 3px; color: var(--muted); font-size: 12px; }
+    .demo-control {
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+    .demo-control label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .demo-control select {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 10px;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .game-links {
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 34px;
+      font-weight: 850;
+      color: var(--blue);
+      background: #fff;
+      border-top: 1px solid var(--line);
+    }
+    .game-links button {
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font-weight: inherit;
+      text-transform: lowercase;
+    }
+    .game-links .rules-link { color: #498838; }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-left: 1px solid var(--line);
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+    .product-card {
+      min-height: 160px;
+      border-radius: 0;
+      border: 0;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      box-shadow: none;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .product-visual {
+      min-height: 72px;
+      border-radius: 6px;
+      background:
+        radial-gradient(circle at 70% 26%, rgba(255,214,92,.72), transparent 38px),
+        linear-gradient(135deg, #e7f7ff, #edf7e5 58%, #fff1ce);
+    }
+    .product-card strong { margin-top: 10px; font-size: 14px; }
+    .product-card span { color: var(--muted); font-size: 12px; }
+    .scenario-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      border-left: 1px solid var(--line);
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+    .scenario-title {
+      min-height: 38px;
+      display: grid;
+      place-items: center;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      font-weight: 780;
+    }
+    .wide-card {
+      min-height: 140px;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      text-align: center;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .wide-card strong { display: block; font-size: 18px; }
+    .wide-card span { display: block; margin-top: 6px; color: var(--muted); }
+    .ugc {
+      min-height: 180px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .ugc div {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.9), rgba(255,255,255,.72)),
+        linear-gradient(135deg, #dff4ff, #e9f7df);
+    }
+    .terms {
+      max-width: 900px;
+      margin: 0 auto;
+      color: #465266;
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(6, 16, 30, .62);
+    }
+    .modal-backdrop.open { display: flex; }
+    body.modal-open { overflow: hidden; }
+    .modal {
+      width: min(520px, 100%);
+      max-height: min(720px, calc(100vh - 40px));
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: 0 28px 90px rgba(0,0,0,.34);
+    }
+    .modal-head {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .modal-head h3 { margin: 0; font-size: 18px; }
+    .close-btn {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: #fff;
+      font-size: 20px;
+      line-height: 1;
+    }
+    .modal-body {
+      overflow: auto;
+      padding: 18px;
+    }
+    .modal-foot {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      padding: 14px 18px;
+      border-top: 1px solid var(--line);
+      background: #fbfdff;
+    }
+    .coupon {
+      display: grid;
+      grid-template-columns: 126px minmax(0, 1fr);
+      align-items: center;
+      overflow: hidden;
+      border: 1px solid #ffdca8;
+      border-radius: var(--radius);
+      background: #fff8e8;
+    }
+    .coupon-value {
+      min-height: 126px;
+      display: grid;
+      place-items: center;
+      color: #481b00;
+      background: linear-gradient(135deg, #ffe88a, #ff9945);
+      font-size: 30px;
+      font-weight: 950;
+      text-align: center;
+    }
+    .coupon-info { padding: 16px; min-width: 0; }
+    .coupon-info h4 { margin: 0; font-size: 20px; }
+    .coupon-info p { margin: 7px 0 0; color: var(--muted); line-height: 1.55; }
+    .prize-list { display: grid; gap: 10px; }
+    .prize-row {
+      display: grid;
+      grid-template-columns: 74px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfdff;
+    }
+    .prize-thumb {
+      min-height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      background: #fff1c8;
+      color: #8a4b00;
+      font-weight: 950;
+    }
+    .prize-row strong, .prize-row span { display: block; }
+    .prize-row span { margin-top: 3px; color: var(--muted); font-size: 12px; }
+    .empty {
+      min-height: 150px;
+      display: grid;
+      place-items: center;
+      border: 1px dashed #c9d4e3;
+      border-radius: var(--radius);
+      color: var(--muted);
+      text-align: center;
+    }
+    .rules-list {
+      display: grid;
+      gap: 12px;
+      color: #3f4c5f;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+    .rules-list b { color: var(--ink); }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 40;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      border-radius: 999px;
+      color: #fff;
+      background: rgba(20, 29, 43, .92);
+      transition: .24s ease;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 900px) {
+      .game-grid { grid-template-columns: 1fr; }
+      .side-card { order: 2; }
+      .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stage { min-height: 460px; aspect-ratio: auto; }
+    }
+    @media (max-width: 640px) {
+      .tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tabs a { font-size: 13px; }
+      .wrap { padding: 18px 12px; }
+      .game-toolbar { align-items: flex-start; flex-direction: column; }
+      .quick-actions { justify-content: flex-start; }
+      .status-row { grid-template-columns: 1fr; max-width: 190px; gap: 7px; }
+      .stage { min-height: 520px; }
+      .goal { top: 128px; width: 86%; height: 180px; }
+      .keeper { top: 248px; }
+      .exchange-box {
+        right: 10px;
+        bottom: 112px;
+        width: 134px;
+      }
+      .ball.left { transform: translate(-104px, -254px) scale(.54) rotate(-340deg); }
+      .ball.right { transform: translate(104px, -254px) scale(.54) rotate(340deg); }
+      .product-grid, .scenario-row, .ugc { grid-template-columns: 1fr; }
+      .coupon, .prize-row { grid-template-columns: 1fr; }
+      .coupon-value { min-height: 96px; }
+      .modal-foot { flex-direction: column; }
+      .modal-foot button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="banner">
+      <div class="banner-inner">
+        <h1>Strike to Save: Penalty King</h1>
+        <p>Cheer Louder, Lights Smarter. Score big on and off the pitch. Play the penalty shootout to unlock exclusive deals.</p>
+        <div class="discount">UP to 45% OFF</div>
+      </div>
+    </header>
+
+    <nav class="tabs" aria-label="活动分区">
+      <a href="#game">Strike to Save: Penalty King</a>
+      <a href="#top-picks">Fans' Top Picks</a>
+      <a href="#home">The Match, At Home</a>
+      <a href="#stadium">Stadium Vibes, Everywhere</a>
+    </nav>
+
+    <section id="game" aria-labelledby="game-title">
+      <div class="section-head gold"><span class="trophy">🏆</span><span id="game-title">Strike to Save: Penalty King</span><span class="trophy">🏆</span></div>
+      <div class="wrap">
+        <div class="game-grid">
+          <article class="game-card">
+            <div class="game-toolbar">
+              <div>
+                <h2>Penalty Challenge</h2>
+                <p id="loginText">当前为未登录演示态，点击踢球会先触发登录。</p>
+              </div>
+              <div class="quick-actions">
+                <button class="ghost-btn" type="button" data-open="prize">My Prize</button>
+                <button class="ghost-btn" type="button" data-open="rules">Rules</button>
+              </div>
+            </div>
+
+            <div class="stage" aria-live="polite">
+              <div class="status-row">
+                <div class="status-pill"><span>今日次数</span><strong id="attempts">1</strong></div>
+                <div class="status-pill"><span>金币</span><strong id="coins">60</strong></div>
+                <div class="status-pill"><span>已中奖励</span><strong id="prizeCount">0</strong></div>
+              </div>
+              <div class="stadium-lights"><i class="light-bar"></i><i class="light-bar"></i></div>
+              <div class="goal" aria-hidden="true"></div>
+              <div id="keeper" class="keeper" aria-hidden="true"></div>
+              <div class="penalty-box" aria-hidden="true"></div>
+              <div id="ball" class="ball" aria-hidden="true"></div>
+              <aside class="exchange-box">
+                <b>兑换次数区</b>
+                <span>20金币兑换每日额外1次参与机会</span>
+                <button id="exchangeBtn" type="button">20金币兑换</button>
+              </aside>
+              <div class="kick-zone">
+                <button id="kickBtn" class="primary-btn" type="button">开始踢球</button>
+                <div id="stageNote" class="stage-note">每日1次免费机会，命中即自动发券。</div>
+              </div>
+            </div>
+
+            <div class="game-links">
+              <button type="button" data-open="prize">my prize</button>
+              <button type="button" data-open="rules" class="rules-link">rules</button>
+            </div>
+          </article>
+
+          <aside class="side-card" aria-label="奖励等级">
+            <h3>奖励设置</h3>
+            <div class="reward-list">
+              <div class="reward-item"><div class="badge">Miss</div><div><strong>未中奖</strong><span>再接再厉</span></div></div>
+              <div class="reward-item"><div class="badge">替补</div><div><strong>替补球员</strong><span>3元无门槛</span></div></div>
+              <div class="reward-item"><div class="badge">主力</div><div><strong>主力射手奖励券</strong><span>5元无门槛</span></div></div>
+              <div class="reward-item"><div class="badge">明星</div><div><strong>明星射手奖励券</strong><span>10元无门槛</span></div></div>
+              <div class="reward-item"><div class="badge">传奇</div><div><strong>传奇点球王惊喜券</strong><span>免费产品</span></div></div>
+            </div>
+            <div class="demo-control">
+              <label for="demoResult">原型演示结果</label>
+              <select id="demoResult">
+                <option value="auto">自动轮换</option>
+                <option value="miss">未中奖：再接再厉</option>
+                <option value="bench">替补球员：3元无门槛</option>
+                <option value="main">主力射手：5元无门槛</option>
+                <option value="star">明星射手：10元无门槛</option>
+                <option value="legend">传奇点球王：免费产品</option>
+              </select>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="top-picks">
+      <div class="section-head blue"><span class="trophy">🏆</span><span>Fans' Top Picks</span><span class="trophy">🏆</span></div>
+      <div class="product-grid">
+        <div class="product-card"><div class="product-visual"></div><strong>产品一</strong><span>观赛氛围灯</span></div>
+        <div class="product-card"><div class="product-visual"></div><strong>产品二</strong><span>沉浸式灯带</span></div>
+        <div class="product-card"><div class="product-visual"></div><strong>产品三</strong><span>桌面电竞灯</span></div>
+        <div class="product-card"><div class="product-visual"></div><strong>产品四</strong><span>电视背光套装</span></div>
+        <div class="product-card"><div class="product-visual"></div><strong>产品五</strong><span>球迷精选套装</span></div>
+        <div class="product-card"><div class="product-visual"></div><strong>产品六</strong><span>派对氛围灯</span></div>
+        <div class="product-card"><div class="product-visual"></div><strong>产品七</strong><span>智能灯泡组合</span></div>
+        <div class="product-card"><div class="product-visual"></div><strong>产品八</strong><span>全屋联动套装</span></div>
+      </div>
+    </section>
+
+    <section id="home">
+      <div class="section-head green">The Match, At Home</div>
+      <div class="wide-card"><strong>场景 页面中Banner</strong><span>客厅观赛氛围与转化入口</span></div>
+      <div class="product-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+        <div class="product-card"><div class="product-visual"></div><strong>产品一</strong><span>电视区域氛围</span></div>
+        <div class="product-card"><div class="product-visual"></div><strong>产品二</strong><span>沙发边线性灯</span></div>
+      </div>
+    </section>
+
+    <section id="stadium">
+      <div class="section-head yellow">Stadium Vibes, Everywhere</div>
+      <div class="scenario-row">
+        <div class="scenario-title">Outdoor Watch Party</div>
+        <div class="scenario-title">Immersive Bedroom Sideline</div>
+      </div>
+      <div class="product-grid" style="grid-template-columns: repeat(4, minmax(0, 1fr));">
+        <div class="product-card"><div class="product-visual"></div><strong>产品一</strong><span>户外灯串</span></div>
+        <div class="product-card"><div class="product-visual"></div><strong>产品二</strong><span>庭院氛围灯</span></div>
+        <div class="product-card"><div class="product-visual"></div><strong>产品三</strong><span>卧室灯带</span></div>
+        <div class="product-card"><div class="product-visual"></div><strong>产品四</strong><span>床头氛围灯</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head gray"><span>Bring Your Game Night to Light</span></div>
+      <div class="wide-card"><strong>Share Your Match Night Setup</strong><span>此处同官网跳转</span></div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="ugc" aria-label="UGC内容">
+          <div></div><div></div><div></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">活动条款/规则</div>
+      <div class="wrap">
+        <div class="terms">
+          用户需登录后参与点球大战。每日默认1次免费参与机会；每日可额外使用20金币兑换1次参与机会。每次点球成功后，优惠券立即自动领取到账户；未中奖展示“再接再厉”，仍有次数时可直接重新参与。奖励以活动页面及账户内展示为准。
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="modalBackdrop" class="modal-backdrop" role="presentation">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <h3 id="modalTitle">Modal</h3>
+        <button id="closeModal" class="close-btn" type="button" aria-label="关闭">×</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+      <div id="modalFoot" class="modal-foot"></div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const rewards = {
+      miss: { level: "未中奖", name: "再接再厉", value: "MISS", type: "none", code: "" },
+      bench: { level: "替补球员", name: "3元无门槛优惠券", value: "¥3", type: "coupon", code: "PK3-GOVEE" },
+      main: { level: "主力射手", name: "5元无门槛优惠券", value: "¥5", type: "coupon", code: "PK5-GOVEE" },
+      star: { level: "明星射手", name: "10元无门槛优惠券", value: "¥10", type: "coupon", code: "PK10-GOVEE" },
+      legend: { level: "传奇点球王", name: "免费产品惊喜券", value: "FREE", type: "product", code: "LEGEND-FREE" }
+    };
+
+    const state = {
+      loggedIn: false,
+      attempts: 1,
+      coins: 60,
+      extraExchanged: false,
+      prizeHistory: [],
+      autoIndex: 0,
+      playing: false
+    };
+
+    const order = ["bench", "miss", "main", "star", "legend"];
+    const $ = (id) => document.getElementById(id);
+    const els = {
+      attempts: $("attempts"),
+      coins: $("coins"),
+      prizeCount: $("prizeCount"),
+      kickBtn: $("kickBtn"),
+      exchangeBtn: $("exchangeBtn"),
+      note: $("stageNote"),
+      loginText: $("loginText"),
+      ball: $("ball"),
+      keeper: $("keeper"),
+      demoResult: $("demoResult"),
+      modal: $("modalBackdrop"),
+      modalTitle: $("modalTitle"),
+      modalBody: $("modalBody"),
+      modalFoot: $("modalFoot"),
+      toast: $("toast")
+    };
+
+    function render() {
+      els.attempts.textContent = state.attempts;
+      els.coins.textContent = state.coins;
+      els.prizeCount.textContent = state.prizeHistory.length;
+      els.kickBtn.disabled = state.playing || (state.loggedIn && state.attempts <= 0);
+      els.kickBtn.textContent = state.playing ? "射门中..." : state.loggedIn && state.attempts <= 0 ? "今日次数已用完" : "开始踢球";
+      els.exchangeBtn.disabled = state.extraExchanged || state.coins < 20 || state.playing;
+      els.exchangeBtn.textContent = state.extraExchanged ? "今日已兑换" : "20金币兑换";
+      els.loginText.textContent = state.loggedIn
+        ? "已登录，可参与点球大战。中奖后奖励自动领取到账户。"
+        : "当前为未登录演示态，点击踢球会先触发登录。";
+    }
+
+    function showToast(text) {
+      els.toast.textContent = text;
+      els.toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => els.toast.classList.remove("show"), 1800);
+    }
+
+    function openModal(title, body, foot) {
+      els.modalTitle.textContent = title;
+      els.modalBody.innerHTML = body;
+      els.modalFoot.innerHTML = foot || "";
+      els.modal.classList.add("open");
+      document.body.classList.add("modal-open");
+      const focusTarget = els.modal.querySelector("button");
+      if (focusTarget) focusTarget.focus();
+    }
+
+    function closeModal() {
+      els.modal.classList.remove("open");
+      document.body.classList.remove("modal-open");
+      els.kickBtn.focus();
+    }
+
+    function loginModal() {
+      openModal(
+        "登录后参与",
+        `<p style="margin:0;color:#465266;line-height:1.7">用户必须登录后才能玩点球大战。登录成功后保留当前活动页状态，并可直接使用每日免费参与机会。</p>`,
+        `<button class="ghost-btn" type="button" onclick="closeModal()">稍后</button><button class="dark-btn" type="button" onclick="mockLogin()">模拟登录并继续</button>`
+      );
+    }
+
+    function mockLogin() {
+      state.loggedIn = true;
+      closeModal();
+      showToast("已登录，可以开始踢球");
+      render();
+    }
+
+    function nextResult() {
+      const selected = els.demoResult.value;
+      if (selected !== "auto") return selected;
+      const result = order[state.autoIndex % order.length];
+      state.autoIndex += 1;
+      return result;
+    }
+
+    function kick() {
+      if (!state.loggedIn) {
+        loginModal();
+        return;
+      }
+      if (state.attempts <= 0) {
+        exhaustedModal();
+        return;
+      }
+      if (state.playing) return;
+
+      state.playing = true;
+      state.attempts -= 1;
+      const resultKey = nextResult();
+      const lane = resultKey === "miss" ? "left" : ["left", "center", "right"][Math.floor(Math.random() * 3)];
+      const keeperLane = resultKey === "miss" ? "left" : lane === "left" ? "right" : "left";
+
+      els.ball.className = "ball";
+      els.keeper.className = "keeper";
+      render();
+      els.note.textContent = "射门中，等待结果...";
+
+      window.setTimeout(() => {
+        els.ball.classList.add(lane);
+        els.keeper.classList.add(keeperLane);
+      }, 80);
+
+      window.setTimeout(() => {
+        state.playing = false;
+        const reward = rewards[resultKey];
+        if (resultKey === "miss") {
+          els.note.textContent = state.attempts > 0 ? "未命中，可继续参与。" : "未命中，今日次数已用完。";
+          lostModal();
+        } else {
+          const prize = {
+            ...reward,
+            id: `${resultKey}-${Date.now()}`,
+            status: "已领取",
+            expires: "2026-07-19 23:59"
+          };
+          state.prizeHistory.unshift(prize);
+          els.note.textContent = `${reward.level}，奖励已自动领取。`;
+          winModal(prize);
+        }
+        resetField();
+        render();
+      }, 980);
+    }
+
+    function resetField() {
+      window.setTimeout(() => {
+        els.ball.className = "ball fade";
+        els.keeper.className = "keeper";
+      }, 260);
+      window.setTimeout(() => {
+        els.ball.className = "ball";
+      }, 620);
+    }
+
+    function winModal(prize) {
+      openModal(
+        "点球成功",
+        `<div class="coupon">
+          <div class="coupon-value">${prize.value}</div>
+          <div class="coupon-info">
+            <h4>${prize.level}</h4>
+            <p>${prize.name}已自动领取至账户，可在 My Prize 查看。</p>
+            <p>券码：<b>${prize.code}</b><br>有效期：${prize.expires}</p>
+          </div>
+        </div>`,
+        `<button class="ghost-btn" type="button" onclick="closeModal()">继续浏览</button><button class="dark-btn" type="button" onclick="showPrizeModal()">查看 My Prize</button>`
+      );
+    }
+
+    function lostModal() {
+      const canRetry = state.attempts > 0;
+      const action = canRetry
+        ? `<button class="dark-btn" type="button" onclick="closeModal(); kick()">再踢一次</button>`
+        : `<button class="dark-btn" type="button" onclick="closeModal(); exchangeAttempt()">兑换次数</button>`;
+      openModal(
+        "再接再厉",
+        `<div class="empty"><div><strong>这次没有命中</strong><br><span>${canRetry ? "仍有参与次数，可直接重新参与。" : "今日免费次数已用完，可用20金币兑换一次额外机会。"}</span></div></div>`,
+        `<button class="ghost-btn" type="button" onclick="closeModal()">关闭</button>${action}`
+      );
+    }
+
+    function exhaustedModal() {
+      openModal(
+        "今日次数已用完",
+        `<p style="margin:0;color:#465266;line-height:1.7">每日默认1次免费参与机会。你还可以使用20金币兑换每日额外1次参与机会。</p>`,
+        `<button class="ghost-btn" type="button" onclick="closeModal()">稍后</button><button class="dark-btn" type="button" onclick="closeModal(); exchangeAttempt()">20金币兑换</button>`
+      );
+    }
+
+    function exchangeAttempt() {
+      if (!state.loggedIn) {
+        loginModal();
+        return;
+      }
+      if (state.extraExchanged) {
+        showToast("今日额外机会已兑换");
+        return;
+      }
+      if (state.coins < 20) {
+        showToast("金币不足，无法兑换");
+        return;
+      }
+      state.coins -= 20;
+      state.attempts += 1;
+      state.extraExchanged = true;
+      els.note.textContent = "已兑换1次额外机会。";
+      showToast("兑换成功，已增加1次参与机会");
+      render();
+    }
+
+    function showPrizeModal() {
+      const list = state.prizeHistory.length
+        ? `<div class="prize-list">${state.prizeHistory.map((item) => `
+          <div class="prize-row">
+            <div class="prize-thumb">${item.value}</div>
+            <div><strong>${item.name}</strong><span>${item.level} · ${item.status} · ${item.expires}</span><span>券码：${item.code}</span></div>
+            <button class="mini-btn" type="button" onclick="copyCode('${item.code}', this)">Copy</button>
+          </div>`).join("")}</div>`
+        : `<div class="empty"><div><strong>暂无奖励</strong><br><span>点球成功后，优惠券会自动进入这里。</span></div></div>`;
+      openModal(
+        "My Prize",
+        list,
+        `<button class="dark-btn" type="button" onclick="closeModal()">关闭</button>`
+      );
+    }
+
+    function copyCode(code, btn) {
+      navigator.clipboard?.writeText(code);
+      btn.textContent = "Copied";
+      showToast("券码已复制");
+      window.setTimeout(() => { btn.textContent = "Copy"; }, 1400);
+    }
+
+    function showRulesModal() {
+      openModal(
+        "Rules",
+        `<div class="rules-list">
+          <div><b>参与资格</b><br>用户必须登录后才能参与点球大战。</div>
+          <div><b>玩法流程</b><br>进入活动页后可看到门框、守门员和点球区足球。点击开始踢球后播放射门动画，并根据服务端结果展示命中或未命中。</div>
+          <div><b>参与次数</b><br>每日默认1次免费参与机会，无额外门槛。每日额外1次参与机会，可花费20金币在门框旁兑换次数区兑换。</div>
+          <div><b>奖励触发</b><br>每一次点球成功，立即弹出优惠券并自动领取。miss无奖励，若仍有参与次数可直接重新参与。</div>
+          <div><b>奖励等级</b><br>未中奖：再接再厉；替补球员：3元无门槛；主力射手：5元无门槛；明星射手：10元无门槛；传奇点球王：免费产品。</div>
+          <div><b>发放说明</b><br>优惠券和免费产品券以账户内 My Prize 记录为准，过期未使用视为自动失效。</div>
+        </div>`,
+        `<button class="dark-btn" type="button" onclick="closeModal()">关闭</button>`
+      );
+    }
+
+    document.querySelectorAll("[data-open='prize']").forEach((btn) => btn.addEventListener("click", showPrizeModal));
+    document.querySelectorAll("[data-open='rules']").forEach((btn) => btn.addEventListener("click", showRulesModal));
+    els.kickBtn.addEventListener("click", kick);
+    els.exchangeBtn.addEventListener("click", exchangeAttempt);
+    $("closeModal").addEventListener("click", closeModal);
+    els.modal.addEventListener("click", (event) => {
+      if (event.target === els.modal) closeModal();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && els.modal.classList.contains("open")) closeModal();
+    });
+    render();
+  </script>
+</body>
+</html>
